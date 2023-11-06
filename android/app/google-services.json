@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "567806911759",
+    "project_id": "flutter-firebase-loginui",
+    "storage_bucket": "flutter-firebase-loginui.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567806911759:android:57529d9ae84961a20b4a7a",
+        "android_client_info": {
+          "package_name": "com.example.firebase_test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiM8NBgR3IdtAORbA6lLP4A_dM03c5Y7M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
