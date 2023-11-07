@@ -1,3 +1,4 @@
+import 'package:firebase_test/home_page.dart';
 import 'package:firebase_test/pages/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       routes: {
         "/loginPage": (context) => LoginPage(),
         "/signUp": (context) => SignUp(),
+        "/homePage": (context) => HomePage(),
       },
       home: LoginPage(),
     );

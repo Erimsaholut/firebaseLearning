@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -9,6 +10,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final topImageAddress = "assets/images/topImage.png";
+  final formKey = GlobalKey<FormState>();
+  late String email, password;
 
   @override
   Widget build(BuildContext context) {
@@ -31,24 +34,60 @@ class _LoginPageState extends State<LoginPage> {
               ), //topImage
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    titleText(),
-                    usernameTextField(),
-                    customSizedBox(),
-                    passwordTextField(),
-                    customSizedBox(expand: 2),
-                    signInButton(),
-                    forgotPasswordButton(),
-                    signUpButton(),
-                  ],
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      titleText(),
+                      emailTextField(),
+                      customSizedBox(),
+                      passwordTextField(),
+                      customSizedBox(expand: 2),
+                      signInButton(),
+                      forgotPasswordButton(),
+                      signUpButton(),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  TextFormField emailTextField() {
+    return TextFormField(
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Bilgileri Eksiksiz Doldurunuz";
+        }
+        return null;
+      },
+      onSaved: (value) {
+        email = value!;
+      },
+      style: const TextStyle(color: Colors.white),
+      decoration: customInputDecoration("Email"),
+    );
+  }
+
+  TextFormField passwordTextField() {
+    return TextFormField(
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Bilgileri Eksiksiz Doldurunuz";
+        }
+        return null;
+      },
+      onSaved: (value) {
+        password = value!;
+      },
+      obscureText: true,
+      style: const TextStyle(color: Colors.white),
+      decoration: customInputDecoration("Parola"),
     );
   }
 
@@ -79,20 +118,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  TextField usernameTextField() {
-    return TextField(
-      decoration: customInputDecoration("Kullanici Adi"),
-      style: TextStyle(color: Colors.white),
-    );
-  }
-
-  TextFormField passwordTextField() {
-    return TextFormField(
-      obscureText: true,
-      style: const TextStyle(color: Colors.white),
-      decoration: customInputDecoration("Parola"),
-    );
-  }
   Center forgotPasswordButton() {
     return Center(
       child: TextButton(
@@ -111,7 +136,19 @@ class _LoginPageState extends State<LoginPage> {
         style: ButtonStyle(
             overlayColor:
                 MaterialStateColor.resolveWith((states) => Colors.grey)),
-        onPressed: () {},
+        onPressed: () async {
+          if (formKey.currentState!.validate()) {
+            formKey.currentState!.save();
+            try {
+              final userResult = await FirebaseAuth.instance
+                  .signInWithEmailAndPassword(email: email, password: password);
+              print(userResult.user!.email);
+              Navigator.pushNamed(context, "/homePage");
+            } catch (e) {
+              print(e.toString());
+            }
+          }
+        },
         child: Container(
           height: 50.0,
           width: 150.0,
