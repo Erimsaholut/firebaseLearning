@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -10,6 +11,7 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final topImageAddress = "assets/images/topImage.png";
   final formKey = GlobalKey<FormState>();
+  final firebaseAuth = FirebaseAuth.instance;
   late String email, password;
 
   @override
@@ -89,6 +91,7 @@ class _SignUpState extends State<SignUp> {
         if (value!.isEmpty) {
           return "Bilgileri Eksiksiz Doldurunuz";
         }
+        return null;
       },
       onSaved: (value) {
         email = value!;
@@ -101,9 +104,10 @@ class _SignUpState extends State<SignUp> {
   TextFormField passwordTextField() {
     return TextFormField(
       validator: (value) {
-        if (value!.isEmpty && value.length < 6) {
+        if (value!.isEmpty) {
           return "Bilgileri Eksiksiz Doldurunuz";
         }
+        return null;
       },
       onSaved: (value) {
         password = value!;
@@ -117,9 +121,25 @@ class _SignUpState extends State<SignUp> {
   Center signUpButton() {
     return Center(
       child: TextButton(
-        onPressed: () {
+        onPressed: () async {
           if (formKey.currentState!.validate()) {
             formKey.currentState!.save();
+            try {
+              var userResult =
+                  await firebaseAuth.createUserWithEmailAndPassword(
+                      email: email, password: password);
+              print(userResult.user!.uid);
+              formKey.currentState!.reset();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                      "Hesap oluşturuldu , giris sayfasina yönlendiriliyorsunuz. "),
+                ),
+              );
+              Navigator.pushNamed(context, "/loginPage");
+            } catch (e) {
+              print(e.toString());
+            }
           }
         },
         child: Text(
