@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_test/service/auth_service.dart';
+import 'package:firebase_test/widgets/custom_text_button.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,6 +13,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final topImageAddress = "assets/images/topImage.png";
   final formKey = GlobalKey<FormState>();
+  final authService = AuthService();
   late String email, password;
 
   @override
@@ -45,8 +48,31 @@ class _LoginPageState extends State<LoginPage> {
                       passwordTextField(),
                       customSizedBox(expand: 2),
                       signInButton(),
-                      forgotPasswordButton(),
-                      signUpButton(),
+                      customSizedBox(expand: 0.5),
+                      Center(
+                          child: CustomTextButton(
+                              onPressed: () {
+                                authService.forgotPassword(email);
+                              }, buttonText: "Şifremi Unuttum")),
+                      customSizedBox(expand: 0.5),
+                      Center(
+                          child: CustomTextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, "/signUp");
+                              },
+                              buttonText: "Hesap Oluştur")),
+                      Center(
+                          child: CustomTextButton(
+                              onPressed: () async {
+                                final result =
+                                    await authService.signInAnonymous();
+                                if (result != null) {
+                                  Navigator.pushNamed(context, "/homePage");
+                                }else{
+                                  print("Hata");
+                                }
+                              },
+                              buttonText: "Misafir Girişi")),
                     ],
                   ),
                 ),
@@ -121,7 +147,9 @@ class _LoginPageState extends State<LoginPage> {
   Center forgotPasswordButton() {
     return Center(
       child: TextButton(
-        onPressed: () {},
+        onPressed: () {
+
+        },
         child: Text(
           "Şifremi Unuttum",
           style: TextStyle(color: Colors.pink.shade200),
@@ -135,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
       child: TextButton(
         style: ButtonStyle(
             overlayColor:
-                MaterialStateColor.resolveWith((states) => Colors.grey)),
+            MaterialStateColor.resolveWith((states) => Colors.grey)),
         onPressed: () async {
           if (formKey.currentState!.validate()) {
             formKey.currentState!.save();

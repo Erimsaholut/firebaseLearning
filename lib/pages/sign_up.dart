@@ -45,7 +45,9 @@ class _SignUpState extends State<SignUp> {
                       customSizedBox(),
                       passwordTextField(),
                       customSizedBox(),
+                      customSizedBox(),
                       signUpButton(),
+                      customSizedBox(),
                       backToLoginPageButton(),
                     ],
                   ),
@@ -66,9 +68,10 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  SizedBox customSizedBox() {
-    return const SizedBox(
-      height: 20,
+
+  SizedBox customSizedBox({double expand = 1}) {
+    return SizedBox(
+      height: 20 * expand,
     );
   }
 
