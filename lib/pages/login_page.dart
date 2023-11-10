@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_test/service/auth_service.dart';
 import 'package:firebase_test/widgets/custom_text_button.dart';
 import 'package:flutter/material.dart';
+import '../widgets/customInputDecoration.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,7 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   final topImageAddress = "assets/images/topImage.png";
   final formKey = GlobalKey<FormState>();
   final authService = AuthService();
-  late String email, password;
+   late String email,nameSurname,userName, password;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +45,10 @@ class _LoginPageState extends State<LoginPage> {
                       titleText(),
                       emailTextField(),
                       customSizedBox(),
+                      nameSurnameTextField(),
+                      customSizedBox(),
+                      userNameTextField(),
+                      customSizedBox(),
                       passwordTextField(),
                       customSizedBox(expand: 2),
                       signInButton(),
@@ -53,7 +57,8 @@ class _LoginPageState extends State<LoginPage> {
                           child: CustomTextButton(
                               onPressed: () {
                                 authService.forgotPassword(email);
-                              }, buttonText: "Şifremi Unuttum")),
+                              },
+                              buttonText: "Şifremi Unuttum")),
                       customSizedBox(expand: 0.5),
                       Center(
                           child: CustomTextButton(
@@ -68,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                                     await authService.signInAnonymous();
                                 if (result != null) {
                                   Navigator.pushNamed(context, "/homePage");
-                                }else{
+                                } else {
                                   print("Hata");
                                 }
                               },
@@ -99,7 +104,36 @@ class _LoginPageState extends State<LoginPage> {
       decoration: customInputDecoration("Email"),
     );
   }
-
+  TextFormField nameSurnameTextField() {
+    return TextFormField(
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Bilgileri Eksiksiz Doldurunuz";
+        }
+        return null;
+      },
+      onSaved: (value) {
+        nameSurname = value!;
+      },
+      style: const TextStyle(color: Colors.white),
+      decoration: customInputDecoration("Ad Soyad"),
+    );
+  }
+  TextFormField userNameTextField() {
+    return TextFormField(
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Bilgileri Eksiksiz Doldurunuz";
+        }
+        return null;
+      },
+      onSaved: (value) {
+        userName = value!;
+      },
+      style: const TextStyle(color: Colors.white),
+      decoration: customInputDecoration("Kullanici Adi"),
+    );
+  }
   TextFormField passwordTextField() {
     return TextFormField(
       validator: (value) {
@@ -131,25 +165,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  InputDecoration customInputDecoration(String hintText) {
-    return InputDecoration(
-      hintText: hintText,
-      hintStyle: const TextStyle(color: Colors.grey),
-      enabledBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.grey),
-      ),
-      focusedBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.grey),
-      ),
-    );
-  }
-
   Center forgotPasswordButton() {
     return Center(
       child: TextButton(
-        onPressed: () {
-
-        },
+        onPressed: () {},
         child: Text(
           "Şifremi Unuttum",
           style: TextStyle(color: Colors.pink.shade200),
@@ -163,18 +182,29 @@ class _LoginPageState extends State<LoginPage> {
       child: TextButton(
         style: ButtonStyle(
             overlayColor:
-            MaterialStateColor.resolveWith((states) => Colors.grey)),
+                MaterialStateColor.resolveWith((states) => Colors.grey)),
         onPressed: () async {
           if (formKey.currentState!.validate()) {
             formKey.currentState!.save();
-            try {
-              final userResult = await FirebaseAuth.instance
-                  .signInWithEmailAndPassword(email: email, password: password);
-              print(userResult.user!.email);
+             final result = await authService.signIn(email,nameSurname,userName,password);
+            if (result == "success") {
               Navigator.pushNamed(context, "/homePage");
-            } catch (e) {
-              print(e.toString());
+            } else {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("hata"),
+                      content: Text(result!),
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text("Geri Dön"))
+                      ],
+                    );
+                  });
             }
+            //Navigator.pushNamed(context, "/homePage");
           }
         },
         child: Container(
